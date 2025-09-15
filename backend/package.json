@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend of my app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TanushShoor/Quickpolls.git"
+  },
+  "author": "Tanush Shoor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TanushShoor/Quickpolls/issues"
+  },
+  "homepage": "https://github.com/TanushShoor/Quickpolls#readme",
+  "dependencies": {
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.18.1"
+  }
+}
