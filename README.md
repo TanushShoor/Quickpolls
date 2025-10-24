@@ -109,5 +109,45 @@ NODE_ENV=production
 ```bash
 git clone https://github.com/TanushShoor/Quickpolls.git
 cd Quickpolls
+```
+
+### 2️⃣ Setup backend
+```bash
+cd backend
+npm install
+npm run dev
+```
+### 3️⃣ Setup frontend
+```bash
+cd ../frontend
+npm install
+npm start
 
 ```
+Your frontend will start at:
+👉 http://localhost:3000
+
+##🧑‍💼 About the Developer
+
+👋 Hi, I’m Tanush Shoor
+
+I’m a Computer Science student passionate about full-stack web development, data analytics, and entrepreneurship.
+This project helped me learn how to:
+
+Connect React Frontend ↔ Express Backend with real-world APIs
+
+Handle authentication & cookies securely
+
+Deploy full-stack apps across Render and Vercel
+
+##🌟 Future Improvements
+
+📈 Add visual poll result charts
+
+🔄 Real-time updates with WebSockets
+
+🗑️ Delete or edit polls
+
+💬 Comments or discussion under polls
+
+📱 Mobile-optimized dashboard
