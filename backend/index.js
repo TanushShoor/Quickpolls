@@ -1,3 +1,65 @@
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/db.js";
+import authRoutes from "./routes/auth.js";
+import pollRoutes from "./routes/polls.js";
+
+dotenv.config();
+connectDB();
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+app.use(cookieParser());
+
+// ✅ Hybrid CORS fix
+const allowedOrigins = [
+  "https://quickpolls-puce.vercel.app", // your deployed frontend
+  "http://localhost:3000" // local dev
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+// ✅ Explicit preflight handler (Render fix)
+app.options("*", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.status(200).end();
+});
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("✅ QuickPolls API is running and CORS is fixed!");
+});
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/polls", pollRoutes);
+
+// Server
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+
+
 // // import express from "express";
 // // import dotenv from "dotenv";
 // // import cors from "cors";
@@ -119,52 +181,53 @@
 // app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
 
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import connectDB from "./config/db.js";
-import authRoutes from "./routes/auth.js";
-import pollRoutes from "./routes/polls.js";
 
-dotenv.config();
-connectDB();
+// import express from "express";
+// import dotenv from "dotenv";
+// import cors from "cors";
+// import cookieParser from "cookie-parser";
+// import connectDB from "./config/db.js";
+// import authRoutes from "./routes/auth.js";
+// import pollRoutes from "./routes/polls.js";
 
-const app = express();
+// dotenv.config();
+// connectDB();
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
+// const app = express();
 
-// ✅ Updated and strict CORS setup
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://quickpolls-puce.vercel.app/"
-];
+// // Middleware
+// app.use(express.json());
+// app.use(cookieParser());
 
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204); // handle preflight properly
-  }
-  next();
-});
+// // ✅ Updated and strict CORS setup
+// const allowedOrigins = [
+//   "http://localhost:3000",
+//   "https://quickpolls-puce.vercel.app/"
+// ];
 
-// Test route
-app.get("/", (req, res) => {
-  res.send("QuickPolls API is running ✅");
-});
+// app.use((req, res, next) => {
+//   const origin = req.headers.origin;
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader("Access-Control-Allow-Origin", origin);
+//   }
+//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+//   if (req.method === "OPTIONS") {
+//     return res.sendStatus(204); // handle preflight properly
+//   }
+//   next();
+// });
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/polls", pollRoutes);
+// // Test route
+// app.get("/", (req, res) => {
+//   res.send("QuickPolls API is running ✅");
+// });
 
-// Start server
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+// // Routes
+// app.use("/api/auth", authRoutes);
+// app.use("/api/polls", pollRoutes);
+
+// // Start server
+// const PORT = process.env.PORT || 8000;
+// app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
