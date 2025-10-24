@@ -127,7 +127,7 @@ npm start
 Your frontend will start at:
 👉 http://localhost:3000
 
-##🧑‍💼 About the Developer
+🧑‍💼 About the Developer
 
 👋 Hi, I’m Tanush Shoor
 
@@ -140,7 +140,7 @@ Handle authentication & cookies securely
 
 Deploy full-stack apps across Render and Vercel
 
-##🌟 Future Improvements
+🌟 Future Improvements
 
 📈 Add visual poll result charts
 
