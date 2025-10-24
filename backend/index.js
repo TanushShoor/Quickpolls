@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Hybrid CORS fix
+// ✅ Clean, safe CORS setup
 const allowedOrigins = [
   "https://quickpolls-puce.vercel.app", // your deployed frontend
   "http://localhost:3000" // local dev
@@ -36,22 +36,26 @@ app.use(
   })
 );
 
-// ✅ Explicit preflight handler (Render fix)
-// ✅ Explicit preflight handler (Render-safe version)
-app.options("/*", (req, res) => {
+// ✅ Replace the faulty app.options() with middleware
+app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin) {
+  if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
-  res.sendStatus(200);
+  
+  if (req.method === "OPTIONS") {
+    return res.status(200).send("Preflight OK");
+  }
+  
+  next();
 });
 
 // Test route
 app.get("/", (req, res) => {
-  res.send("✅ QuickPolls API is running and CORS is fixed!");
+  res.send("✅ QuickPolls API is running on Render without CORS issues!");
 });
 
 // Routes
