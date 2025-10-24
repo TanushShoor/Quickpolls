@@ -1,3 +1,4 @@
+// backend/index.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -11,64 +12,53 @@ connectDB();
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
-
-// ✅ Fixed: Comprehensive CORS setup for Vercel + Render
+// ✅ Allowed origins
 const allowedOrigins = [
-  "https://quickpolls-puce.vercel.app", // your deployed frontend
-  "http://localhost:3000", // local dev
+  "https://quickpolls-puce.vercel.app",
+  "http://localhost:3000",
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed for this origin"));
-      }
-    },
-    credentials: true,
-  })
-);
-
-// ✅ This middleware ensures headers are always applied, even if CORS preflight is skipped
+// ✅ Middleware (CORS must come before routes)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Origin", origin);
   }
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type,Authorization"
-  );
-
-  // Handle preflight
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
   next();
 });
 
-// Root test route
+app.use(express.json());
+app.use(cookieParser());
+
+// ✅ Health check route
 app.get("/", (req, res) => {
-  res.send("✅ QuickPolls backend is live and CORS is fully configured!");
+  res.status(200).json({
+    success: true,
+    message: "✅ QuickPolls backend is live and MongoDB connected",
+  });
 });
 
-// Routes
+// ✅ API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/polls", pollRoutes);
 
-// Start server
+// ✅ Safe fallback route (Express 5 compatible)
+app.all(/.*/, (req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
+// ✅ Start server
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
 
 // WORKING:
 // import express from "express";
