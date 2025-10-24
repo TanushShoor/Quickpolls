@@ -15,10 +15,10 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Clean, safe CORS setup
+// ✅ Fixed: Comprehensive CORS setup for Vercel + Render
 const allowedOrigins = [
   "https://quickpolls-puce.vercel.app", // your deployed frontend
-  "http://localhost:3000" // local dev
+  "http://localhost:3000", // local dev
 ];
 
 app.use(
@@ -27,44 +27,190 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(new Error("CORS not allowed for this origin"));
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// ✅ Replace the faulty app.options() with middleware
+// ✅ This middleware ensures headers are always applied, even if CORS preflight is skipped
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) {
     res.header("Access-Control-Allow-Origin", origin);
   }
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
   res.header("Access-Control-Allow-Credentials", "true");
-  
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type,Authorization"
+  );
+
+  // Handle preflight
   if (req.method === "OPTIONS") {
-    return res.status(200).send("Preflight OK");
+    return res.sendStatus(204);
   }
-  
   next();
 });
 
-// Test route
+// Root test route
 app.get("/", (req, res) => {
-  res.send("✅ QuickPolls API is running on Render without CORS issues!");
+  res.send("✅ QuickPolls backend is live and CORS is fully configured!");
 });
 
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/polls", pollRoutes);
 
-// Server
+// Start server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+// WORKING:
+// import express from "express";
+// import dotenv from "dotenv";
+// import cors from "cors";
+// import cookieParser from "cookie-parser";
+// import connectDB from "./config/db.js";
+// import authRoutes from "./routes/auth.js";
+// import pollRoutes from "./routes/polls.js";
+
+// dotenv.config();
+// connectDB();
+
+// const app = express();
+
+// // Middleware
+// app.use(express.json());
+// app.use(cookieParser());
+
+// // ✅ Clean, safe CORS setup
+// const allowedOrigins = [
+//   "https://quickpolls-puce.vercel.app", // your deployed frontend
+//   "http://localhost:3000" // local dev
+// ];
+
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (!origin || allowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error("Not allowed by CORS"));
+//       }
+//     },
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+
+// // ✅ Replace the faulty app.options() with middleware
+// app.use((req, res, next) => {
+//   const origin = req.headers.origin;
+//   if (allowedOrigins.includes(origin)) {
+//     res.header("Access-Control-Allow-Origin", origin);
+//   }
+//   res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+//   res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+//   res.header("Access-Control-Allow-Credentials", "true");
+  
+//   if (req.method === "OPTIONS") {
+//     return res.status(200).send("Preflight OK");
+//   }
+  
+//   next();
+// });
+
+// // Test route
+// app.get("/", (req, res) => {
+//   res.send("✅ QuickPolls API is running on Render without CORS issues!");
+// });
+
+// // Routes
+// app.use("/api/auth", authRoutes);
+// app.use("/api/polls", pollRoutes);
+
+// // Server
+// const PORT = process.env.PORT || 8000;
+// app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
